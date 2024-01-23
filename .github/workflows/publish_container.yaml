@@ -73,7 +73,7 @@ jobs:
       - name: Generate SBOM for the dev Docker image
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           output-file: sbom-image-latest.json
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
