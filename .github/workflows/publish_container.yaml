@@ -4,7 +4,7 @@ name: Create and publish a Docker image
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   push:
-    branches: ['master']
+    branches: ["master"]
   workflow_dispatch:
 
 # Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
@@ -70,35 +70,40 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Generate SBOM for the dev Docker image
+        uses: anchore/sbom-action@v0
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-development:${{ steps.meta2.outputs.tags }}
+          output-file: sbom-image-latest.json
       - name: Attest image
         uses: github-early-access/generate-build-provenance@main
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
-      - name: Extract metadata (tags, labels) for dev image
-        id: meta2
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-development
-          flavor: |
-            latest=true
-          tags: |
-            type=ref,event=branch
-            type=sha,format=long
-      - name: Build and push dev image
-        id: build-push-development
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          target: development
-          tags: ${{ steps.meta2.outputs.tags }}
-          labels: ${{ steps.meta2.outputs.labels }}
-          annotations: ${{ steps.meta2.outputs.annotations }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Attest dev image
-        uses: github-early-access/generate-build-provenance@main
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-development
-          subject-digest: ${{ steps.build-push-development.outputs.digest }}
+      # - name: Extract metadata (tags, labels) for dev image
+      #   id: meta2
+      #   uses: docker/metadata-action@v5
+      #   with:
+      #     images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-development
+      #     flavor: |
+      #       latest=true
+      #     tags: |
+      #       type=ref,event=branch
+      #       type=sha,format=long
+      # - name: Build and push dev image
+      #   id: build-push-development
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     push: true
+      #     target: development
+      #     tags: ${{ steps.meta2.outputs.tags }}
+      #     labels: ${{ steps.meta2.outputs.labels }}
+      #     annotations: ${{ steps.meta2.outputs.annotations }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      # - name: Attest dev image
+      #   uses: github-early-access/generate-build-provenance@main
+      #   with:
+      #     subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-development
+      #     subject-digest: ${{ steps.build-push-development.outputs.digest }}
