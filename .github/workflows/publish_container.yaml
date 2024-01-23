@@ -73,7 +73,7 @@ jobs:
       - name: Generate SBOM for the dev Docker image
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-development:${{ steps.meta.outputs.tags }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
           output-file: sbom-image-latest.json
       - name: Attest image
         uses: github-early-access/generate-build-provenance@main
