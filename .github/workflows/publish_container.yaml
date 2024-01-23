@@ -63,7 +63,7 @@ jobs:
         id: build-push-latest
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -75,6 +75,8 @@ jobs:
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
           output-file: sbom-image-latest.json
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
       - name: Attest image
         uses: github-early-access/generate-build-provenance@main
         with:
