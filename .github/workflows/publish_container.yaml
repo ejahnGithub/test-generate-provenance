@@ -16,7 +16,8 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
       id-token: write
       contents: write
       packages: write
@@ -33,7 +34,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about) to extract tags and labels that will be applied to the specified image. The `id` "meta" allows the output of this step to be referenced in a subsequent step. The `images` value provides the base name for the tags and labels.
-      - name: Extract metadata (tadockgs, labels) for Docker
+      - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -72,7 +73,7 @@ jobs:
       - name: Generate SBOM for the dev Docker image
         uses: anchore/sbom-action@v0
         with:
-          path: ./ 
+          path: ./
           output-file: sbom-image-latest.json
       - name: Upload sbom-image-latest.json to GitHub
         uses: actions/upload-artifact@v2
