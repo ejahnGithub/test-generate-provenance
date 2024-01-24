@@ -73,13 +73,13 @@ jobs:
       - name: Generate SBOM for the dev Docker image
         uses: anchore/sbom-action@v0
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          path: ./
           output-file: sbom-image-latest.json
-          registry-username: ${{ github.actor }}
-          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          // use action upload so i can download and debug 
       - name: Attest image
         uses: github-early-access/generate-build-provenance@main
         with:
+          sbom: sbom-image-latest.json
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
       # - name: Extract metadata (tags, labels) for dev image
