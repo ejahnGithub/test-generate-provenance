@@ -17,7 +17,6 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
-    permissions:docker pull ghcr.io/ejahngithub/test-generate-provenance:sha-03fd52d8f7ad9e7698c854115629e3396fc93aa6
       id-token: write
       contents: write
       packages: write
