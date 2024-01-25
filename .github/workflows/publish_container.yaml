@@ -81,8 +81,9 @@ jobs:
           name: sbom-image-latest.json
           path: sbom-image-latest.json
       - name: Attest image
-        uses: github-early-access/generate-build-provenance@main
+        uses: github-early-access/generate-build-provenance@eugene/support-upload-sbom
         with:
+          sbom: sbom-image-latest.json
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
       # - name: Extract metadata (tags, labels) for dev image
