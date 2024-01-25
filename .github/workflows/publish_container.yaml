@@ -86,6 +86,7 @@ jobs:
           sbom: sbom-image-latest.json
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
+          # test
       # - name: Extract metadata (tags, labels) for dev image
       #   id: meta2
       #   uses: docker/metadata-action@v5
