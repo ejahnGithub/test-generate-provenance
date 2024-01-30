@@ -1,7 +1,6 @@
 # https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#upgrading-a-workflow-that-accesses-ghcrio
 name: Create and publish a Docker image
 
-# Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   release:
     types: [published]
@@ -44,6 +43,25 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,format=long
+      - name: Get Release ID
+        id: get_release
+        run: |
+          RELEASE_RESPONSE=$(curl \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }})
+          echo "RELEASE_ID=$(echo "$RELEASE_RESPONSE" | jq .id)" >> $GITHUB_ENV
+
+      - name: Update Release Body
+        if: env.RELEASE_ID != ''
+        run: |
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            -d "{\"body\": \"Docker Image Tag: ${{ steps.meta.outputs.tags }}\n```\ndocker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}\n```\nVerify the contents of the image:\n```\ngh attestation verify oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }} --owner ${{ github.actor }}\n```\"}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/${{ env.RELEASE_ID }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
       # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see "[Usage](https://github.com/docker/build-push-action#usage)" in the README of the `docker/build-push-action` repository.
       # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
@@ -72,23 +90,3 @@ jobs:
           sbom: sbom-image-latest.json
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
-      - name: Create or Update GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          # Set the tag name and release name
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          # Add information about the Docker image to the release notes
-          body: |
-            Docker Image Tag: ${{ steps.meta.outputs.tags }}
-            ```
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
-            ```
-            Verify the contents of the image:
-            ```
-            gh attestation verify oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }} --owner ${{ github.actor }}
-            ```
-          # Set the release to draft if you want to manually review it before publishing
-          # draft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
