@@ -60,6 +60,11 @@ jobs:
         with:
           path: ./
           output-file: sbom-image-latest.json
+      - name: Upload sbom-image-latest.json to GitHub
+        uses: actions/upload-artifact@v2
+        with:
+          name: sbom-image-latest.json
+          path: sbom-image-latest.json
       - name: Attest image
         uses: github-early-access/generate-build-provenance@eugene/support-upload-sbom
         with:
