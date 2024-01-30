@@ -60,11 +60,6 @@ jobs:
         with:
           path: ./
           output-file: sbom-image-latest.json
-      - name: Upload sbom-image-latest.json to GitHub
-        uses: actions/upload-artifact@v2
-        with:
-          name: sbom-image-latest.json
-          path: sbom-image-latest.json
       - name: Attest image
         uses: github-early-access/generate-build-provenance@eugene/support-upload-sbom
         with:
@@ -86,3 +81,4 @@ jobs:
             ```
             gh attestation verify oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push-latest.outputs.digest }} --owner ${{ github.actor }}
             ```
+            Action: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
