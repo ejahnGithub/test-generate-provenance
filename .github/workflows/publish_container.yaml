@@ -86,4 +86,3 @@ jobs:
             ```
             gh attestation verify oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push-latest.outputs.digest }} --owner ${{ github.actor }}
             ```
-            Action: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
