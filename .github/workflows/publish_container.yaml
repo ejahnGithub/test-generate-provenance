@@ -72,3 +72,23 @@ jobs:
           sbom: sbom-image-latest.json
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # Set the tag name and release name
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          # Add information about the Docker image to the release notes
+          body: |
+            Docker Image Tag: ${{ steps.meta.outputs.tags }}
+            ```
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+            ```
+            Verify the contents of the image:
+            ```
+            gh attestation verify oci://${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }} --owner ${{ github.actor }}
+            ```
+          # Set the release to draft if you want to manually review it before publishing
+          # draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
