@@ -9,7 +9,6 @@ on:
 # Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 # There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
@@ -21,6 +20,10 @@ jobs:
       contents: write
       packages: write
     steps:
+      - name: Lowercase repository name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
+          echo $IMAGE_NAME
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
