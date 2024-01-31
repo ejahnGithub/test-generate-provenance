@@ -71,6 +71,7 @@ jobs:
           sbom: sbom-image-latest.json
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-push-latest.outputs.digest }}
+          push-to-registry: true
       - name: update release
         id: update_release
         uses: tubone24/update_release@v1.0
