@@ -87,3 +87,5 @@ docker run -it -p "$ARQUIVO_PORT":3001 \
 ```
 
 This should bind a webserver to http://localhost:12346/ , and off you go. Consult this repository for the Dockerfile. A production image is published to `ghcr.io/phillmv/arquivo`.
+
+
